@@ -1,24 +1,21 @@
 #include "Hardware.h"
 #include "Game.h"
 
-// Variables d'état pour les boutons
+// Variables d'état pour les inputs
 int lastBtnState[] = { HIGH, HIGH, HIGH };
 unsigned long lastDebounce[] = { 0, 0, 0 };
+unsigned long lastPiezoTime = 0; 
+const int PIEZO_THRESHOLD = 700;
+const int PIEZO_COOLDOWN = 100;  
 int value1 = 0;
 
-
-// On initialise le cerveau du jeu
 Game game(30);
 
 void setup() {
   Serial.begin(9600);
-  initHardware();  // On appelle la fonction simplifiée du fichier Hardware.h
+  initHardware(); 
   Serial.println("Système prêt !");
 }
-
-unsigned long lastPiezoTime = 0; 
-const int PIEZO_THRESHOLD = 700;
-const int PIEZO_COOLDOWN = 100;  
 
 void loop() {
   int value1 = analogRead(A0);
@@ -62,7 +59,6 @@ void checkInput(int lane, long now) {
   if (state != lastBtnState[lane] && (millis() - lastDebounce[lane]) > 50) {
     lastDebounce[lane] = millis();
     if (state == LOW) {
-      // Logique de détection du hit
       long minDiff = 20000;
       for (int i = 0; i < game.getNSteps(); i++) {
         if (game.getStepLane(i) == lane) {
