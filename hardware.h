@@ -3,7 +3,7 @@
 
 #include <Adafruit_NeoPixel.h>
 
-// --- CONFIGURATION PHYSIQUE ---
+// constantes des leds
 #define NUMPIXELS 8
 #define BRIGHTNESS 10
 
@@ -16,14 +16,14 @@ const int BTN_PINS[] = {13, 12, 11}; // Rouge, Vert, Bleu
 // Les pins pour les buzzer Piezo
 const int PIEZO_PINS[] = {A0};
 
-// --- OBJETS ---
+// création un tableau d'objets 
 Adafruit_NeoPixel pixels[] = {
   Adafruit_NeoPixel(NUMPIXELS, LED_PINS[0], NEO_GRB + NEO_KHZ800),
   Adafruit_NeoPixel(NUMPIXELS, LED_PINS[1], NEO_GRB + NEO_KHZ800),
   Adafruit_NeoPixel(NUMPIXELS, LED_PINS[2], NEO_GRB + NEO_KHZ800)
 };
 
-// --- INITIALISATION ---
+//initialisation du hardware
 void initHardware() {
   for (int i = 0; i < 3; i++) {
     pinMode(BTN_PINS[i], INPUT_PULLUP);
