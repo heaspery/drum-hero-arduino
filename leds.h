@@ -4,13 +4,19 @@
 #include <Adafruit_NeoPixel.h>
 #include "Game.h"
 
-// constantes des leds
 #define NUMPIXELS 72
-#define BRIGHTNESS 50
+#define BRIGHTNESS 10
 
-static const int LED_PINS[] = { 4, 3, 2 };
-const int TIME_TRAVEL = 2000;
+static const int LED_PINS[] = {2, 3, 4};
 
+const int TIME_TRAVEL_BASE = 4000;
+
+// gestion de la difficulté
+static float currentDifficulty = 1.0f;
+static float targetDifficulty  = 1.0f;   
+static unsigned long lastDifficultyUpdate = 0;
+static unsigned long flashUntilMs = 0; 
+static unsigned long lastFrameMs = 0;
 
 inline Adafruit_NeoPixel pixels[] = {
   Adafruit_NeoPixel(NUMPIXELS, LED_PINS[0], NEO_GRB + NEO_KHZ800),
@@ -24,52 +30,55 @@ inline void initHardware() {
     pixels[i].setBrightness(BRIGHTNESS);
     pixels[i].show();
   }
+  lastDifficultyUpdate = millis(); 
 }
 
-// fonction qui permet d'afficher les leds au bon moment
 inline void displayLeds(long now, Game &game) {
-  for (int l = 0; l < 3; l++) pixels[l].clear();
+
+  unsigned long ms = millis();
+
+  if (ms - lastDifficultyUpdate > 5000) {
+    if (currentDifficulty > 0.4f) {
+      currentDifficulty -= 0.20f;
+      flashUntilMs = ms + 120; 
+    }
+    lastDifficultyUpdate = ms;
+  }
+
+  for (int l = 0; l < 3; l++) {
+    pixels[l].clear();
+    pixels[l].setPixelColor(0, pixels[l].Color(10, 10, 10));
+  }
+
+  long currentTimeTravel = (long)(TIME_TRAVEL_BASE * currentDifficulty);
+  if (currentTimeTravel < 1) currentTimeTravel = 1; 
 
   for (int i = 0; i < game.getNSteps(); i++) {
     long noteTime = game.getStepTime(i);
+
+    if (noteTime < now) continue;
+    if (noteTime > now + currentTimeTravel) break;
+
     int lane = game.getStepLane(i);
 
-    if (noteTime >= now && noteTime <= now + TIME_TRAVEL) {
-      float progress = (float)(noteTime - now) / TIME_TRAVEL;
+    float progress = (float)(noteTime - now) / (float)currentTimeTravel;
+    int ledPos = (int)(progress * (NUMPIXELS - 1));
 
-      // Inversion pour que la note défile vers la première LED
-      int ledPos = progress * (NUMPIXELS - 1);
+    uint32_t cHead;
+    if (lane == 0)      cHead = pixels[lane].Color(255, 0, 0);
+    else if (lane == 1) cHead = pixels[lane].Color(0, 255, 0);
+    else                cHead = pixels[lane].Color(0, 0, 255);
 
-      uint32_t color = (lane == 0) ? pixels[lane].Color(255, 0, 0) : (lane == 1) ? pixels[lane].Color(0, 255, 0)
-                                                                                 : pixels[lane].Color(0, 0, 255);
-
-      // On définit des variantes de la couleur pour l'effet de traînée
-      // On diminue les composantes RGB pour réduire l'éclat
-      uint32_t colorHead = color;
-      uint32_t colorMid = (lane == 0) ? pixels[lane].Color(100, 0, 0) : (lane == 1) ? pixels[lane].Color(0, 100, 0)
-                                                                                    : pixels[lane].Color(0, 0, 100);
-      uint32_t colorTail = (lane == 0) ? pixels[lane].Color(30, 0, 0) : (lane == 1) ? pixels[lane].Color(0, 30, 0)
-                                                                                    : pixels[lane].Color(0, 0, 30);
-
-      // Affichage des 3 pixels avec sécurité pour ne pas sortir du ruban (0 à 71)
-      if (ledPos >= 0 && ledPos < NUMPIXELS) {
-        pixels[lane].setPixelColor(ledPos, colorHead);
-      }
-      if (ledPos + 1 >= 0 && ledPos + 1 < NUMPIXELS) {
-        pixels[lane].setPixelColor(ledPos + 1, colorMid);
-      }
-      if (ledPos + 2 >= 0 && ledPos + 2 < NUMPIXELS) {
-        pixels[lane].setPixelColor(ledPos + 2, colorTail);
-      }
-      if (ledPos + 2 >= 0 && ledPos + 3 < NUMPIXELS) {
-        pixels[lane].setPixelColor(ledPos + 3, colorTail);
-      }
-      if (ledPos + 2 >= 0 && ledPos + 2 < NUMPIXELS) {
-        pixels[lane].setPixelColor(ledPos + 3, colorTail);
-      }
+    if (ledPos >= 0 && ledPos < NUMPIXELS) {
+      pixels[lane].setPixelColor(ledPos, cHead);
+      if (ledPos + 1 < NUMPIXELS) pixels[lane].setPixelColor(ledPos + 1, cHead / 2);
     }
   }
-  for (int l = 0; l < 3; l++) pixels[l].show();
+
+  for (int l = 0; l < 3; l++) {
+    pixels[l].show();
+  }
 }
 
 #endif
+
