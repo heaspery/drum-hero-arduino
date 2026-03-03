@@ -1,7 +1,101 @@
 console.log("sketch");
 
+// Songs data
+const arcade_platformer = {
+  name: "arcade_platformer",
+  notes: [
+    64, 67, 71, 67,
+    64, 60, 62, 64,
+    67, 71, 72,
+    71, 67, 64,
+    60, 62, 64, 67,
+    64, 60,
+
+    67, 71, 74, 72,
+    71, 67,
+    64, 67, 71,
+    69, 67,
+    64, 62, 60
+  ],
+  duration: [
+    200,150,200,150,
+    200,150,150,200,
+    150,200,300,
+    150,200,300,
+    150,150,200,300,
+    200,300,
+
+    200,150,200,150,
+    200,300,
+    150,150,300,
+    200,300,
+    200,200,300
+  ]
+};
+
+const epic_adventure = {
+  name: "epic_adventure",
+  notes: [
+    64, 69, 71,
+    72, 71, 69,
+    67, 64,
+    67, 71, 72,
+    74, 72, 71,
+
+    69, 67, 64,
+    67, 69, 71,
+    72, 71,
+    69, 67
+  ],
+  duration: [
+    300,200,200,
+    300,150,200,
+    300,300,
+    200,200,300,
+    300,200,300,
+
+    200,200,300,
+    200,150,300,
+    300,200,
+    300,350
+  ]
+};
+
+const route_chill = {
+  name: "route_chill",
+  notes: [
+    60, 62, 64,
+    67, 64, 62,
+    60, 62, 64,
+    69, 67,
+
+    64, 62, 60,
+    62, 64, 67,
+    69, 67,
+    64, 62
+  ],
+  duration: [
+    250,200,250,
+    300,200,200,
+    250,200,250,
+    300,300,
+
+    250,200,250,
+    200,200,300,
+    300,200,
+    300,350
+  ]
+};
+
+const songs = [arcade_platformer, epic_adventure, route_chill];
+
+function getRandomSong() {
+  const i = Math.floor(Math.random() * songs.length);
+  return songs[i];
+}
+
 let serial; // variable to hold an instance of the serialport library
-let portName = "/dev/tty.usbmodem3401"; // fill in your serial port name here
+let portName = "/dev/tty.usbmodem3301"; // fill in your serial port name here
 
 let width = window.innerWidth;
 let height = window.innerHeight;
@@ -12,43 +106,9 @@ let bestScore = 0;
 let bestCombo = 0;
 
 let index = 0;
-let notes = [
-  64, 59, 60, 62,
-  60, 59, 57,
-  57, 60, 64, 62,
-  60, 59,
-  59, 60, 62, 64,
-  60, 57, 57,
-
-  62, 65, 69, 67,
-  65, 64,
-  60, 64, 62, 60,
-  59,
-  59, 60, 62, 64,
-  60, 57, 57,
-  64, 59, 60, 62,
-  60, 59, 57,
-  57, 60, 64
-];
-
-let noteDuration = [
-  300, 150, 150, 300,
-  150, 150, 300,
-  200, 150, 300, 150,
-  150, 300,
-  200, 150, 150, 300,
-  200, 300, 300,
-
-  300, 150, 300, 150,
-  150, 300,
-  300, 150, 150, 300,
-  300,
-  200, 150, 150, 300,
-  200, 300, 300,
-  300, 150, 150, 300,
-  150, 150, 300,
-  200, 150, 300
-];
+let notes = [];
+let noteDuration = [];
+let currentSong = null;
 
 let isMiss = false;
 let isSuccess = false;
@@ -60,6 +120,9 @@ let osc;
 function setup() {
   console.log("Setup sketch");
   createCanvas(width, height);
+
+  // Load random song
+  loadRandomSong();
 
   document.addEventListener('mousedown', resumeAudio);
   document.addEventListener('keydown', resumeAudio);
@@ -97,7 +160,6 @@ function resumeAudio() {
   getAudioContext().resume().catch(err => {
     console.log("Audio context resume failed:", err);
   });
-  // Remove listeners once audio is started
   document.removeEventListener('mousedown', resumeAudio);
   document.removeEventListener('keydown', resumeAudio);
   document.removeEventListener('touchstart', resumeAudio);
@@ -148,9 +210,15 @@ function serialEvent() {
       }
 
       if (data.state !== undefined) {
+        // Load new random song when transitioning from state 0 to 1
+        if (gameState === 0 && data.state === 1) {
+          loadRandomSong();
+        }
+        
         gameState = data.state;
         if (data.state === 0) {
           successHistory = [];
+          index = 0; // Reset note index
         }
       }
     } catch (e) {
@@ -171,6 +239,14 @@ function portClose() {
 
 function sendValues() {
 
+}
+
+function loadRandomSong() {
+  currentSong = getRandomSong();
+  notes = currentSong.notes;
+  noteDuration = currentSong.duration;
+  index = 0;
+  console.log("Loaded song:", currentSong.name);
 }
 
 function playNote(noteNumber, duration) {

@@ -10,7 +10,7 @@
 
 static const int LED_PINS[] = {2, 3, 4};
 
-const int TIME_TRAVEL_BASE = 1200;
+const int TIME_TRAVEL_BASE = 1500;
 
 inline Adafruit_NeoPixel pixels[] = {
   Adafruit_NeoPixel(NUMPIXELS, LED_PINS[0], NEO_GRB + NEO_KHZ800),
