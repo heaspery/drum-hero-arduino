@@ -56,7 +56,7 @@ public:
     long timeBasis = 1000;
 
     for (int i = 0; i < _nSteps; i++) {
-      timeBasis += 400;
+      timeBasis += 300;
 
       _steps[i].time = timeBasis;
       _steps[i].lane = random(3);

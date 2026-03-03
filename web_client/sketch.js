@@ -1,7 +1,7 @@
 console.log("sketch");
 
 let serial; // variable to hold an instance of the serialport library
-let portName = "/dev/tty.usbmodem3301"; // fill in your serial port name here
+let portName = "/dev/tty.usbmodem3401"; // fill in your serial port name here
 
 let width = window.innerWidth;
 let height = window.innerHeight;
@@ -11,15 +11,59 @@ let score = 0;
 let bestScore = 0;
 let bestCombo = 0;
 
+let index = 0;
+let notes = [
+  64, 59, 60, 62,
+  60, 59, 57,
+  57, 60, 64, 62,
+  60, 59,
+  59, 60, 62, 64,
+  60, 57, 57,
+
+  62, 65, 69, 67,
+  65, 64,
+  60, 64, 62, 60,
+  59,
+  59, 60, 62, 64,
+  60, 57, 57,
+  64, 59, 60, 62,
+  60, 59, 57,
+  57, 60, 64
+];
+
+let noteDuration = [
+  300, 150, 150, 300,
+  150, 150, 300,
+  200, 150, 300, 150,
+  150, 300,
+  200, 150, 150, 300,
+  200, 300, 300,
+
+  300, 150, 300, 150,
+  150, 300,
+  300, 150, 150, 300,
+  300,
+  200, 150, 150, 300,
+  200, 300, 300,
+  300, 150, 150, 300,
+  150, 150, 300,
+  200, 150, 300
+];
+
 let isMiss = false;
 let isSuccess = false;
 let gameState = 0;
 
 let successHistory = [];
+let osc;
 
 function setup() {
   console.log("Setup sketch");
   createCanvas(width, height);
+
+  document.addEventListener('mousedown', resumeAudio);
+  document.addEventListener('keydown', resumeAudio);
+  document.addEventListener('touchstart', resumeAudio);
 
   // serial
   serial = new p5.SerialPort();
@@ -35,6 +79,10 @@ function setup() {
   serial.list(); // list the serial ports
   serial.open(portName); // open a serial port
 
+  osc = new p5.SawOsc();
+  osc.start();
+  osc.amp(0);
+
 }
 
 // get the list of ports:
@@ -43,6 +91,16 @@ function printList(portList) {
   for (let i = 0; i < portList.length; i++) {
     console.log(i + ": " + portList[i]);
   }
+}
+
+function resumeAudio() {
+  getAudioContext().resume().catch(err => {
+    console.log("Audio context resume failed:", err);
+  });
+  // Remove listeners once audio is started
+  document.removeEventListener('mousedown', resumeAudio);
+  document.removeEventListener('keydown', resumeAudio);
+  document.removeEventListener('touchstart', resumeAudio);
 }
 
 function serverConnected() {
@@ -65,25 +123,38 @@ function serialEvent() {
     isSuccess = true;
     isMiss = false;
     successHistory.push(true);
+    playNote(notes[index], noteDuration[index]);
+    index++;
+    if (index >= notes.length) {
+      index = 0;
+    }
   } else {
     isMiss = false;
     isSuccess = false;
-    let data = JSON.parse(rawData);
-    console.log(data);
 
-    if (data.combo !== undefined) {
-      combo = data.combo;
-    }
+    rawData = rawData.trim();
+    if (!rawData) return;
 
-    if (data.score !== undefined) {
-      score = data.score;
-    }
+    try {
+      let data = JSON.parse(rawData);
+      console.log(data);
 
-    if (data.state !== undefined) {
-      gameState = data.state;
-      if (data.state === 0) {
-        successHistory = [];
+      if (data.combo !== undefined) {
+        combo = data.combo;
       }
+
+      if (data.score !== undefined) {
+        score = data.score;
+      }
+
+      if (data.state !== undefined) {
+        gameState = data.state;
+        if (data.state === 0) {
+          successHistory = [];
+        }
+      }
+    } catch (e) {
+      console.warn("Invalid JSON from serial:", rawData);
     }
 
   }
@@ -100,6 +171,21 @@ function portClose() {
 
 function sendValues() {
 
+}
+
+function playNote(noteNumber, duration) {
+  if (!osc) return;
+
+  let frequency = 440 * Math.pow(2, (noteNumber - 69) / 12);
+
+  let noteDur = duration || 200;
+
+  // Play the note
+  osc.freq(frequency);
+  osc.amp(0.2, 0.05);
+  setTimeout(() => {
+    osc.amp(0, 0.05);
+  }, noteDur * 0.8);
 }
 
 function preload() {
@@ -145,7 +231,7 @@ function draw() {
 
     }
 
-    rect(width / 2 - 500 + i * 20, height - 200, 15, 15);
+    rect(width / 2 - 500 + i * 20, height - 100, 15, 15);
     fill(0);
   }
 
@@ -161,5 +247,4 @@ function draw() {
     text('Game in progress...', width / 2, 200);
   }
 }
-
 
