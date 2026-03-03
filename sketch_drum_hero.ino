@@ -32,7 +32,6 @@ void loop() {
 
     case PLAYING:
       displayLeds(currentTime, game);
-
       // On surveille les capteurs en continu
       for (int i = 0; i < 3; i++) {
         if (isTouchHit(i)) {
@@ -42,7 +41,6 @@ void loop() {
       break;
 
     case FINISHED:
-      Serial.print("Termine ! Score : ");
       Serial.println(game.getScore());
       delay(3000);
       game.setState(WAITING);

@@ -1,3 +1,4 @@
+
 #ifndef LEDS_H
 #define LEDS_H
 
@@ -5,18 +6,11 @@
 #include "Game.h"
 
 #define NUMPIXELS 72
-#define BRIGHTNESS 10
+#define BRIGHTNESS 30
 
 static const int LED_PINS[] = {2, 3, 4};
 
-const int TIME_TRAVEL_BASE = 4000;
-
-// gestion de la difficulté
-static float currentDifficulty = 1.0f;
-static float targetDifficulty  = 1.0f;   
-static unsigned long lastDifficultyUpdate = 0;
-static unsigned long flashUntilMs = 0; 
-static unsigned long lastFrameMs = 0;
+const int TIME_TRAVEL_BASE = 2000;
 
 inline Adafruit_NeoPixel pixels[] = {
   Adafruit_NeoPixel(NUMPIXELS, LED_PINS[0], NEO_GRB + NEO_KHZ800),
@@ -30,27 +24,16 @@ inline void initHardware() {
     pixels[i].setBrightness(BRIGHTNESS);
     pixels[i].show();
   }
-  lastDifficultyUpdate = millis(); 
 }
 
 inline void displayLeds(long now, Game &game) {
-
-  unsigned long ms = millis();
-
-  if (ms - lastDifficultyUpdate > 5000) {
-    if (currentDifficulty > 0.4f) {
-      currentDifficulty -= 0.20f;
-      flashUntilMs = ms + 120; 
-    }
-    lastDifficultyUpdate = ms;
-  }
 
   for (int l = 0; l < 3; l++) {
     pixels[l].clear();
     pixels[l].setPixelColor(0, pixels[l].Color(10, 10, 10));
   }
 
-  long currentTimeTravel = (long)(TIME_TRAVEL_BASE * currentDifficulty);
+  long currentTimeTravel = (long)(TIME_TRAVEL_BASE);
   if (currentTimeTravel < 1) currentTimeTravel = 1; 
 
   for (int i = 0; i < game.getNSteps(); i++) {
@@ -76,6 +59,7 @@ inline void displayLeds(long now, Game &game) {
   }
 
   for (int l = 0; l < 3; l++) {
+    delay(10);
     pixels[l].show();
   }
 }

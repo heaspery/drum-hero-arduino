@@ -1,20 +1,22 @@
+// Game.h
 #ifndef GAME_H
 #define GAME_H
 
 #include <Arduino.h>
 #include <Chrono.h>
-#include "buzzer.h"
 #include "pitches.h"
+#include "buzzer.h"
 
 struct Step {
   long time;
   byte lane;
-  int pitch; 
   bool isHit;
   bool isHandled;
 };
 
-enum GameState { WAITING, PLAYING, FINISHED };
+enum GameState { WAITING,
+                 PLAYING,
+                 FINISHED };
 
 class Game {
 private:
@@ -26,18 +28,12 @@ private:
   int _score = 0;
   int _nextCheckIndex = 0;
 
-  const int tetrisMelody[25] = {
-    NOTE_E5, NOTE_B4, NOTE_C5, NOTE_D5, NOTE_C5, NOTE_B4, NOTE_A4, // Phrase 1
-    NOTE_A4, NOTE_C5, NOTE_E5, NOTE_D5, NOTE_C5, NOTE_B4,          // Phrase 2
-    NOTE_C5, NOTE_D5, NOTE_E5, NOTE_C5, NOTE_A4, NOTE_A4,          // Phrase 3
-    NOTE_D5, NOTE_F5, NOTE_A5, NOTE_G5, NOTE_F5, NOTE_E5           // Phrase 4
-  };
+  int _nextSoundStepIndex = 0;
 
 public:
-  // tolerance en ms 
   const int TOLERANCE = 500;
-
-  Game(int n) : _nSteps(n) {
+  Game(int n)
+    : _nSteps(n) {
     _steps = new Step[_nSteps];
   }
 
@@ -49,34 +45,41 @@ public:
     _score = 0;
     _combo = 0;
     _nextCheckIndex = 0;
-    initializeSteps(); 
+    _nextSoundStepIndex = 0;
+    initializeSteps();
     _state = PLAYING;
     _myChrono.restart();
   }
 
-  // Initialisation avec la mélodie 
   void initializeSteps() {
     randomSeed(analogRead(A5));
     long timeBasis = 1000;
-    
+
     for (int i = 0; i < _nSteps; i++) {
-      timeBasis += 400; 
-      
+      timeBasis += 400;
+
       _steps[i].time = timeBasis;
       _steps[i].lane = random(3);
       _steps[i].isHit = false;
       _steps[i].isHandled = false;
-      
-      // On boucle sur le tableau tetrisMelody pour remplir les steps
-      _steps[i].pitch = tetrisMelody[i % 25]; 
     }
   }
 
   void update() {
+      sendGameState();
     if (_state == PLAYING) {
       checkMissed();
-      if (now() > _steps[_nSteps - 1].time + TOLERANCE) {
+
+      long t = now();
+
+      while (_nextSoundStepIndex < _nSteps && t >= _steps[_nextSoundStepIndex].time) {
+        _nextSoundStepIndex++;
+      }
+
+      if (t > _steps[_nSteps - 1].time + TOLERANCE) {
+        delay(5000);
         _state = FINISHED;
+        _score = 0;
       }
     }
   }
@@ -85,20 +88,17 @@ public:
     for (int i = _nextCheckIndex; i < _nSteps; i++) {
       if (_steps[i].lane == lane && !_steps[i].isHandled) {
         long diff = labs(now - _steps[i].time);
-        
+
         if (diff <= TOLERANCE) {
           _score++;
           _steps[i].isHit = true;
           _steps[i].isHandled = true;
           _combo++;
-          
-          // Joue la note spécifique associée à ce Step
-          playNote(_steps[i].pitch, 150); 
-          
+
           Serial.println("SUCCESS");
-          return; 
+          return;
         }
-        if (_steps[i].time > now + 1000) break; 
+        if (_steps[i].time > now + 1000) break;
       }
     }
   }
@@ -106,24 +106,51 @@ public:
   void checkMissed() {
     long currentTime = now();
     while (_nextCheckIndex < _nSteps && currentTime > (_steps[_nextCheckIndex].time + TOLERANCE)) {
-        if (!_steps[_nextCheckIndex].isHandled) {
-            _steps[_nextCheckIndex].isHandled = true;
-            _steps[_nextCheckIndex].isHit = false;
-            _combo = 0;
-        }
-        _nextCheckIndex++;
+      if (!_steps[_nextCheckIndex].isHandled) {
+        _steps[_nextCheckIndex].isHandled = true;
+        _steps[_nextCheckIndex].isHit = false;
+        _combo = 0;
+        Serial.println("MISS");
+      }
+      _nextCheckIndex++;
     }
   }
 
+  // envoie l'état du jeu
+  void sendGameState() {
+    Serial.print("{\"state\":");
+    Serial.print(_state);
+    Serial.print(",\"score\":");
+    Serial.print(_score);
+    Serial.print(",\"combo\":");
+    Serial.print(_combo);
+    Serial.print(",\"nextCheckIndex\":");
+    Serial.print(_nextCheckIndex);
+    Serial.println("}");
+  }
+
   // Getters
-  GameState getState() { return _state; }
-  void setState(GameState s) { _state = s; }
-  long now() { return _myChrono.elapsed(); }
-  int getNSteps() { return _nSteps; }
-  long getStepTime(int i) { return _steps[i].time; }
-  int getStepLane(int i) { return _steps[i].lane; }
-  int getScore() { return _score; }
-  int getStepPitch(int i) { return _steps[i].pitch; }
+  GameState getState() {
+    return _state;
+  }
+  void setState(GameState s) {
+    _state = s;
+  }
+  long now() {
+    return _myChrono.elapsed();
+  }
+  int getNSteps() {
+    return _nSteps;
+  }
+  long getStepTime(int i) {
+    return _steps[i].time;
+  }
+  int getStepLane(int i) {
+    return _steps[i].lane;
+  }
+  int getScore() {
+    return _score;
+  }
 };
 
 #endif

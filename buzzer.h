@@ -1,14 +1,21 @@
 #ifndef BUZZER_H
 #define BUZZER_H
 
+#include <TimerFreeTone.h>
 #include <Arduino.h>
 #include "pitches.h"
+#include "game.h"
 
 static const int BUZZER_PIN = 6;
 
-inline void playNote(int frequency, int duration = 400) {
-  if (frequency > 0) {
-    tone(BUZZER_PIN, frequency, duration);
+int melody[] = { 262, 196, 196, 220, 196, 247, 262 };
+int index = 0;
+
+inline void playNote() {   
+  tone(BUZZER_PIN, melody[index], 80); 
+  index++;
+  if(index == 7) {
+    index = 0;
   }
 }
 
