@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 static const uint8_t SENSOR_PINS[] = { 10, 11, 12 };
-// cooldown
+// min delay between two hits on the same sensor (ms)
 static const unsigned long HIT_COOLDOWN_MS = 250;
 
 static unsigned long lastTouchHitTime[3] = { 0, 0, 0 };
@@ -21,25 +21,25 @@ inline void initTouchSensors() {
   }
 }
 
-// Retourne true une seule fois par touché + debounce + cooldown
+// returns true once per tap (debounce + cooldown)
 inline bool isTouchHit(int lane) {
   const unsigned long now = millis();
   const uint8_t pin = SENSOR_PINS[lane];
 
   uint8_t reading = digitalRead(pin);
 
-  // Détection de changement brut
+  // raw state change detection
   if (reading != lastReadState[lane]) {
     lastReadState[lane] = reading;
     lastChangeTime[lane] = now;
   }
 
-  // Si l'état est stable assez longtemps, on l'accepte comme stable
+  // accept as stable if unchanged long enough
   if ((now - lastChangeTime[lane]) >= DEBOUNCE_MS) {
     if (lastStableState[lane] != reading) {
       lastStableState[lane] = reading;
 
-      // On déclenche sur l'entrée dans l'état actif
+      // trigger on entering active state
       if (reading == ACTIVE_STATE) {
         if (now - lastTouchHitTime[lane] > HIT_COOLDOWN_MS) {
           lastTouchHitTime[lane] = now;

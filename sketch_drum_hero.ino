@@ -16,23 +16,23 @@ void setup() {
 }
 
 void loop() {
-  game.update();  // Met à jour le timer interne et vérifie si la game est finie
-  long currentTime = game.now();  // récupère le chrono de la partie
+  game.update();  // update game logic
+  long currentTime = game.now();  // current game time (ms since start)
 
-  switch (game.getState()) {
+  switch (game.getState()) { 
 
     case WAITING:
-      // On utilise le piezo de la lane 0 pour démarrer
+      // wait for touch on sensor 0 to start
       if (isTouchHit(0)) {
-        game.start();
         Serial.println("Let's go!");
-        delay(500);  // Petit délai pour ne pas trigger une note direct au départ
+        delay(200); // short delay to avoid double trigger
+        game.start();
       }
       break;
 
     case PLAYING:
+      // update leds and read the 3 touch sensors
       displayLeds(currentTime, game);
-      // On surveille les capteurs en continu
       for (int i = 0; i < 3; i++) {
         if (isTouchHit(i)) {
           game.checkInput(i, currentTime);
@@ -41,6 +41,7 @@ void loop() {
       break;
 
     case FINISHED:
+      // display score then return to waiting state
       Serial.println(game.getScore());
       delay(3000);
       game.setState(WAITING);

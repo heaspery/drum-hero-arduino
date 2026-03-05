@@ -1,4 +1,3 @@
-// Game.h
 #ifndef GAME_H
 #define GAME_H
 
@@ -7,6 +6,7 @@
 #include "pitches.h"
 #include "buzzer.h"
 
+// one game step (time + lane + result flags)
 struct Step {
   long time;
   byte lane;
@@ -31,7 +31,10 @@ private:
   int _nextSoundStepIndex = 0;
 
 public:
-  const int TOLERANCE = 500;
+
+  // hit window in ms (+/- around step time)
+  const int TOLERANCE = 500; // CHANGE ME IF YOU WANT TO ADAPT THE GAME DIFFICULTY
+
   Game(int n)
     : _nSteps(n) {
     _steps = new Step[_nSteps];
@@ -41,6 +44,7 @@ public:
     delete[] _steps;
   }
 
+  // reset and start a new game
   void start() {
     _score = 0;
     _combo = 0;
@@ -51,12 +55,13 @@ public:
     _myChrono.restart();
   }
 
+  // random steps, spaced by 400ms
   void initializeSteps() {
     randomSeed(analogRead(A5));
     long timeBasis = 1000;
 
     for (int i = 0; i < _nSteps; i++) {
-      timeBasis += 400;
+      timeBasis += 400; // CHANGE ME IF YOU WANT TO ADAPT THE GAME DIFFICULTY
 
       _steps[i].time = timeBasis;
       _steps[i].lane = random(3);
@@ -65,25 +70,30 @@ public:
     }
   }
 
+
   void update() {
-      sendGameState();
+    sendGameState();
     if (_state == PLAYING) {
+      // mark missed steps
       checkMissed();
 
       long t = now();
 
+      // advance sound index (skip past steps)
       while (_nextSoundStepIndex < _nSteps && t >= _steps[_nextSoundStepIndex].time) {
         _nextSoundStepIndex++;
       }
 
+      // end when last step is out of tolerance
       if (t > _steps[_nSteps - 1].time + TOLERANCE) {
-        delay(5000);
+        delay(2000); // let the player see the score before reset
         _state = FINISHED;
         _score = 0;
       }
     }
   }
 
+  // check if this lane matches a step within the hit window
   void checkInput(int lane, long now) {
     for (int i = _nextCheckIndex; i < _nSteps; i++) {
       if (_steps[i].lane == lane && !_steps[i].isHandled) {
@@ -103,6 +113,7 @@ public:
     }
   }
 
+  // if a step is too late and still unhandled -> MISS + combo reset
   void checkMissed() {
     long currentTime = now();
     while (_nextCheckIndex < _nSteps && currentTime > (_steps[_nextCheckIndex].time + TOLERANCE)) {
@@ -116,7 +127,7 @@ public:
     }
   }
 
-  // envoie l'état du jeu
+  // send current game state (JSON over Serial)
   void sendGameState() {
     Serial.print("{\"state\":");
     Serial.print(_state);
@@ -129,7 +140,7 @@ public:
     Serial.println("}");
   }
 
-  // Getters
+  // getters
   GameState getState() {
     return _state;
   }
