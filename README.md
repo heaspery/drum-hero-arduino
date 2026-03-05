@@ -34,7 +34,7 @@ Inspiration pour la forme de l'objet, proche d'une borne d'arcade.
 
 # Vidéos
 
-À ajouter.
+![video](./video/presentation_video.mp4)
 
 ---
 
