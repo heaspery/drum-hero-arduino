@@ -153,3 +153,11 @@ Cela limite le nombre de steps possibles dans une partie. Le nombre de steps se 
 Augmenter fortement ce nombre peut ralentir ou faire planter le jeu.
 
 Des optimisations seraient nécessaires pour améliorer les performances.
+
+--- 
+
+# Pistes d'améliorations
+
+Le jeu pourrait gagner en intérêt si les steps étaient vraiment raccordé à une musique, c'est-à-dire que les steps sont timé pour jouer une réelle mélodie, avec des sons de la bonne durée et des écarts entre les notes corrects. 
+De plus, avec une alimentation externe, il serait intéressant de faire des animations sur les leds plus importantes, pour donner des feedbacks utilisateurs. 
+Finalement, il serait intéressant de donner à l'utilisateur la possibilité d'adapter la difficulté du jeu via le client web. 
