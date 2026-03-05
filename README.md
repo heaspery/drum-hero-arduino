@@ -34,7 +34,7 @@ Inspiration pour la forme de l'objet, proche d'une borne d'arcade.
 
 # Vidéos
 
-Une vidéo de démonstration du prototype final est disponible ici : [Voir la vidéo](./video/presentation_video_480p.mp4)
+#### Une vidéo de démonstration du prototype final est disponible ici : [Voir la vidéo](./video/presentation_video_480p.mp4)
 ---
 
 # Matériel
