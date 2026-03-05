@@ -75,6 +75,7 @@ Le moteur du jeu gère :
 - communication avec l'Arduino via WebSocket
 - client réalisé avec p5.js
 - affichage de l'état du jeu
+- génération du son du jeu
 
 ---
 ## Structure du code
