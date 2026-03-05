@@ -93,6 +93,9 @@ Le projet est organisé en plusieurs modules :
 - **touchsensor.h**  
   Gestion des capteurs tactiles avec debounce et cooldown.
 
+- **/web_client**
+  Interface Web et gestion du son du jeu
+
 ---
 
 # Comment reproduire le projet
