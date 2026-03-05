@@ -1,93 +1,119 @@
 console.log("sketch");
 
 // Songs data
-const arcade_platformer = {
-  name: "arcade_platformer",
+const marioBros = {
+  name: "marioBros",
   notes: [
-    64, 67, 71, 67,
-    64, 60, 62, 64,
-    67, 71, 72,
-    71, 67, 64,
-    60, 62, 64, 67,
-    64, 60,
+    64, 64, 64,
+    60, 64, 67, 55,
 
-    67, 71, 74, 72,
-    71, 67,
-    64, 67, 71,
-    69, 67,
-    64, 62, 60
+    60, 55, 52,
+    57, 59, 58, 57,
+    55, 64, 67, 69,
+    65, 67, 64, 60, 62, 59,
+
+    60, 55, 52,
+    57, 59, 57,
+
+    67, 66, 65, 62, 64,
+    55, 57, 60,
+    57, 60, 62,
+    63, 62, 60,
+
+    60, 55, 52,
+    57, 59, 57
   ],
   duration: [
-    200,150,200,150,
-    200,150,150,200,
-    150,200,300,
-    150,200,300,
-    150,150,200,300,
-    200,300,
+    150, 150, 150,
+    150, 150, 200, 200,
 
-    200,150,200,150,
-    200,300,
-    150,150,300,
-    200,300,
-    200,200,300
+    150, 200, 200,
+    150, 150, 150, 150,
+    150, 150, 150, 150,
+    150, 150, 150, 150, 150, 150,
+
+    150, 200, 200,
+    150, 150, 150,
+
+    150, 150, 150, 150, 150,
+    150, 150, 150,
+    150, 150, 150,
+    150, 150, 150,
+
+    150, 200, 200,
+    150, 150, 150
   ]
 };
 
-const epic_adventure = {
-  name: "epic_adventure",
+const tetris = {
+  name: "tetris",
   notes: [
-    64, 69, 71,
-    72, 71, 69,
-    67, 64,
-    67, 71, 72,
-    74, 72, 71,
-
-    69, 67, 64,
-    67, 69, 71,
-    72, 71,
-    69, 67
-  ],
+  76, 71, 72, 74, 72, 71, 69,
+  69, 72, 76, 74, 72,
+  71, 72, 74, 76,
+  72, 69, 69,
+  74, 77, 81,
+  79, 77, 76,
+  72, 76, 74, 72,
+  71, 71, 72, 74,
+  76, 72, 69, 69
+],
   duration: [
-    300,200,200,
-    300,150,200,
-    300,300,
-    200,200,300,
-    300,200,300,
-
-    200,200,300,
-    200,150,300,
-    300,200,
-    300,350
-  ]
+  200, 100, 100, 200, 100, 100, 200,
+  100, 100, 200, 100, 100,
+  200, 100, 100, 200,
+  200, 200, 200,
+  200, 100, 200,
+  100, 100, 200,
+  100, 200, 100, 100,
+  200, 100, 100, 200,
+  200, 200, 200, 200
+]
 };
 
-const route_chill = {
-  name: "route_chill",
+const pokemonBicycle = {
+  name: "pokemonBicycle",
   notes: [
-    60, 62, 64,
-    67, 64, 62,
-    60, 62, 64,
-    69, 67,
-
-    64, 62, 60,
-    62, 64, 67,
-    69, 67,
-    64, 62
-  ],
+  64, 65, 67, 72, 71,
+  69, 71, 69,
+  65, 67, 69, 74, 72, 71, 69, 71, 72,
+  69, 67, 70,
+  65, 72, 71, 72, 69,
+  65, 64, 65, 67, 72, 71, 72,
+  67, 64, 62, 64, 65, 72,
+  76, 74, 72, 71, 72,
+  74, 74, 72, 71
+],
   duration: [
-    250,200,250,
-    300,200,200,
-    250,200,250,
-    300,300,
-
-    250,200,250,
-    200,200,300,
-    300,200,
-    300,350
-  ]
+  150, 150, 150, 150, 200,
+  150, 150, 200,
+  150, 150, 150, 150, 150, 150, 150, 150, 200,
+  150, 150, 200,
+  150, 150, 150, 150, 200,
+  150, 150, 150, 150, 150, 150, 200,
+  150, 150, 150, 150, 150, 200,
+  150, 150, 150, 150, 200,
+  150, 150, 150, 200
+]
 };
 
-const songs = [arcade_platformer, epic_adventure, route_chill];
+let randomizeSong = {
+  name: "random",
+  notes: [],
+  duration: []
+};
+
+function randomSong() {
+  randomizeSong.notes = [];
+  randomizeSong.duration = [];
+  for (let i = 0; i < 50; i++) {
+    randomizeSong.notes.push(Math.floor(Math.random() * 25) + 60);
+    randomizeSong.duration.push(Math.floor(Math.random() * 150) + 100); 
+  }
+}
+randomSong();
+
+const songs = [tetris, marioBros, pokemonBicycle, randomizeSong];
 
 function getRandomSong() {
   const i = Math.floor(Math.random() * songs.length);
@@ -95,7 +121,7 @@ function getRandomSong() {
 }
 
 let serial; // variable to hold an instance of the serialport library
-let portName = "/dev/tty.usbmodem3301"; // fill in your serial port name here
+let portName = "/dev/tty.usbmodem3401"; // fill in your serial port name here
 
 let width = window.innerWidth;
 let height = window.innerHeight;
@@ -214,7 +240,7 @@ function serialEvent() {
         if (gameState === 0 && data.state === 1) {
           loadRandomSong();
         }
-        
+
         gameState = data.state;
         if (data.state === 0) {
           successHistory = [];
@@ -244,7 +270,7 @@ function sendValues() {
 function loadRandomSong() {
   currentSong = getRandomSong();
   notes = currentSong.notes;
-  noteDuration = currentSong.duration;
+  noteDuration = currentSong.duration || Array(currentSong.notes.length).fill(200);
   index = 0;
   console.log("Loaded song:", currentSong.name);
 }
