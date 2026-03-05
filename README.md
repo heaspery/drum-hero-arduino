@@ -52,7 +52,7 @@ Inspiration pour la forme de l'objet, proche d'une borne d'arcade.
 - câbles de connexion
 - alimentation USB
 
-### Architecture du système
+## Architecture du système
 
 Le système est composé de 4 parties principales :
 
