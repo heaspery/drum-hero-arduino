@@ -95,7 +95,7 @@ Le projet est organisé en plusieurs modules :
   Gestion des capteurs tactiles avec debounce et cooldown.
 
 - **/web_client**
-  Interface Web et gestion du son du jeu
+  Interface Web et gestion du son du jeu.
 
 ---
 
@@ -110,7 +110,8 @@ Le projet est organisé en plusieurs modules :
 1. Reproduire le schéma avec le matériel présenté ou l'adapter à votre matériel.
 2. Adapter les **pins** dans le code selon votre montage.
 3. Adapter la constante `NUMPIXELS` (72) dans le fichier `leds.h` selon la longueur de vos strips.
-4. Connecter la carte Arduino à un ordinateur et **uploader le sketch** du repository.
+4. Télécharger les librairies nécessaires.
+5. Connecter la carte Arduino à un ordinateur et **uploader le sketch** du repository.
 
 ### Interface web (optionnel)
 
@@ -148,7 +149,7 @@ Cela limite le matériel nécessaire mais aussi la puissance disponible.
 C'est pourquoi la luminosité est réglée à **30**, modifiable dans `leds.h`.
 
 De plus, le jeu effectue de nombreuses boucles de vérification et d'affichage.  
-Cela limite le nombre de steps possibles dans une partie.  
+Cela limite le nombre de steps possibles dans une partie. Le nombre de steps se définit à l'initialisation de Game, dans le fichier principal .ino.
 Augmenter fortement ce nombre peut ralentir ou faire planter le jeu.
 
 Des optimisations seraient nécessaires pour améliorer les performances.
