@@ -1,5 +1,4 @@
-# drum-hero-arduino
-
+# Drum Hero Arduino
 Ce projet est un jeu de rythme développé lors d'un cours à option de troisième année de Bachelor en Ingénierie des Médias à la HEIG-VD.
 
 Ayant un attrait particulier pour les jeux vidéo / d'arcade, notamment les jeux de rythme, j'ai trouvé l'idée de créer mon propre jeu intéressante et motivante.
