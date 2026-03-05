@@ -5,7 +5,7 @@
 #include "Game.h"
 
 #define NUMPIXELS 72
-#define BRIGHTNESS 30
+#define BRIGHTNESS 70
 
 static const int LED_PINS[] = {2, 3, 4};
 

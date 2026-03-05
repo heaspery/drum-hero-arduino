@@ -3,8 +3,6 @@
 
 #include <Arduino.h>
 #include <Chrono.h>
-#include "pitches.h"
-#include "buzzer.h"
 
 // one game step (time + lane + result flags)
 struct Step {

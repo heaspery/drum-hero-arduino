@@ -1,7 +1,5 @@
 #include "Leds.h"
 #include "Game.h"
-#include "Pitches.h"
-#include "Buzzer.h"
 #include "TouchSensor.h"
 
 int value1 = 0;
