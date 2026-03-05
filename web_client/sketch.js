@@ -1,5 +1,3 @@
-console.log("sketch");
-
 // Songs data
 const marioBros = {
   name: "marioBros",
@@ -97,12 +95,14 @@ const pokemonBicycle = {
 ]
 };
 
+// one randomized song 
 let randomizeSong = {
   name: "random",
   notes: [],
   duration: []
 };
 
+// function that generate the randomized song
 function randomSong() {
   randomizeSong.notes = [];
   randomizeSong.duration = [];
@@ -111,14 +111,12 @@ function randomSong() {
     randomizeSong.duration.push(Math.floor(Math.random() * 150) + 100); 
   }
 }
+
 randomSong();
 
+// array of songs to choose from
 const songs = [tetris, marioBros, pokemonBicycle, randomizeSong];
 
-function getRandomSong() {
-  const i = Math.floor(Math.random() * songs.length);
-  return songs[i];
-}
 
 let serial; // variable to hold an instance of the serialport library
 let portName = "/dev/tty.usbmodem3401"; // fill in your serial port name here
@@ -168,6 +166,7 @@ function setup() {
   serial.list(); // list the serial ports
   serial.open(portName); // open a serial port
 
+  // instantiate the oscillator for the sound effects
   osc = new p5.SawOsc();
   osc.start();
   osc.amp(0);
@@ -182,6 +181,7 @@ function printList(portList) {
   }
 }
 
+// Function to resume audio context on user interaction
 function resumeAudio() {
   getAudioContext().resume().catch(err => {
     console.log("Audio context resume failed:", err);
@@ -199,10 +199,12 @@ function portOpen() {
   console.log("the serial port is opened.");
 }
 
+// This function is called when data is received from the serial port
 function serialEvent() {
   let rawData = serial.readLine();
   if (!rawData) return;
 
+  // Check for MISS or SUCCESS first
   if (rawData === "MISS") {
     isMiss = true;
     isSuccess = false;
@@ -211,7 +213,7 @@ function serialEvent() {
     isSuccess = true;
     isMiss = false;
     successHistory.push(true);
-    playNote(notes[index], noteDuration[index]);
+    playNote(notes[index], noteDuration[index]); // if success, play the note
     index++;
     if (index >= notes.length) {
       index = 0;
@@ -223,6 +225,7 @@ function serialEvent() {
     rawData = rawData.trim();
     if (!rawData) return;
 
+    // if it's not MISS or SUCCESS, try to parse it as JSON
     try {
       let data = JSON.parse(rawData);
       console.log(data);
@@ -267,6 +270,13 @@ function sendValues() {
 
 }
 
+// function to get a random song from the array
+function getRandomSong() {
+  const i = Math.floor(Math.random() * songs.length);
+  return songs[i];
+}
+
+// Function to load a random song from the songs array
 function loadRandomSong() {
   currentSong = getRandomSong();
   notes = currentSong.notes;
@@ -275,6 +285,7 @@ function loadRandomSong() {
   console.log("Loaded song:", currentSong.name);
 }
 
+// activate the note for a certain duration
 function playNote(noteNumber, duration) {
   if (!osc) return;
 
@@ -291,9 +302,10 @@ function playNote(noteNumber, duration) {
 }
 
 function preload() {
-  font = loadFont('/assets/Evil_Empire.otf');
+  font = loadFont('/assets/Evil_Empire.otf'); // load the local font
 }
 
+// draw text and game state
 function draw() {
   background(300);
   fill(0);
@@ -322,6 +334,7 @@ function draw() {
     bestCombo = combo;
   }
 
+  // Draw success history
   for (let i = 0; i < successHistory.length; i++) {
     if (successHistory[i]) {
       fill(0, 255, 0);
@@ -337,6 +350,7 @@ function draw() {
     fill(0);
   }
 
+  // Display game state messages
   if (gameState == 0) {
     textFont('Arial');
     textSize(30);
