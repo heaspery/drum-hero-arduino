@@ -119,7 +119,7 @@ const songs = [tetris, marioBros, pokemonBicycle, randomizeSong];
 
 
 let serial; // variable to hold an instance of the serialport library
-let portName = "/dev/tty.usbmodem3401"; // fill in your serial port name here
+let portName = "/dev/tty.usbmodem3301"; // fill in your serial port name here
 
 let width = window.innerWidth;
 let height = window.innerHeight;
