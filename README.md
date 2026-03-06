@@ -116,8 +116,9 @@ Le projet est organisé en plusieurs modules :
 
 5. Télécharger **P5.js** : https://p5js.org/download/
 6. Ouvrir le client P5 et sélectionner votre carte Arduino.
-7. Lancer le dossier `web_client` avec un serveur web.
-8. Ouvrir un navigateur sur le port du serveur.
+7. Changer le nom du port dans le fichier sketch.js
+8. Lancer le dossier `web_client` avec un serveur web.
+9. Ouvrir un navigateur sur le port du serveur.
 
 Have fun !
 
