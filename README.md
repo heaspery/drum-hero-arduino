@@ -148,11 +148,11 @@ Dans cette version, les LEDs ne sont **pas alimentées par une source externe**.
 Cela limite le matériel nécessaire mais aussi la puissance disponible.  
 C'est pourquoi la luminosité est réglée à **30**, modifiable dans `leds.h`.
 
-De plus, le jeu effectue de nombreuses boucles de vérification et d'affichage.  
-Cela limite le nombre de steps possibles dans une partie. Le nombre de steps se définit à l'initialisation de Game, dans le fichier principal .ino.
-Augmenter fortement ce nombre peut ralentir ou faire planter le jeu.
+De plus, le jeu effectue de nombreuses boucles de vérification et d'affichage. Il existe sûrement une façon d'optimiser ces processus. 
 
-Des optimisations seraient nécessaires pour améliorer les performances.
+Le nombre de steps se définit à l'initialisation de Game, dans le fichier principal .ino.
+Augmenter fortement ce nombre peut faire planter le jeu, par manque d'espace mémoire. 
+
 
 --- 
 
